@@ -1,0 +1,8 @@
+node_modules/
+.env
+uploads/
+secrets/*
+!secrets/.gitkeep
+coverage/
+frontend/dist/
+npm-debug.log*

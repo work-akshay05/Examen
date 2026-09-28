@@ -1,0 +1,50 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PORT: 4000
+      MONGODB_URI: ${MONGODB_URI:-mongodb://mongo:27017/invoice-risk}
+      STORAGE_DIR: /app/uploads
+      CORS_ORIGIN: http://localhost:5173
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/google-service-account.json
+    volumes:
+      - invoice-uploads:/app/uploads
+      - ./secrets:/run/secrets:ro
+    ports:
+      - "4000:4000"
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    restart: unless-stopped
+    environment:
+      VITE_API_PROXY_TARGET: http://backend:4000
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  mongo-data:
+  invoice-uploads:
