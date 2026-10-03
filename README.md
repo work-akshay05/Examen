@@ -2,7 +2,9 @@
 
 ### *Automated Invoice Screening & Risk Assessment*
 
-![logo](examen-logo.png)
+<p align="center">
+  <img src="examen-logo.png" alt="logo" width="180" />
+</p>
 
 > A full-stack platform for automated invoice verification, risk assessment, and human-in-the-loop review.
 
